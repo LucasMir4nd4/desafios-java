@@ -1,0 +1,23 @@
+2026-11-05 07:59:58 [INFO] PostgreSQL 16 iniciado
+2026-11-05 08:00:00 [INFO] Aceitando conexões na porta 5432
+2026-11-05 08:15:30 [WARN] Número máximo de conexões quase atingido (95/100)
+2026-11-05 08:15:31 [ERROR] Limite de conexões excedido
+2026-11-05 08:15:35 [ERROR] Limite de conexões excedido
+2026-11-05 08:20:00 [INFO] Conexões normalizadas (40/100)
+2026-11-05 09:00:00 [INFO] Backup incremental iniciado
+2026-11-05 09:12:44 [INFO] Backup incremental concluído
+2026-11-05 09:30 [INFO] Vacuum automático na tabela pedidos
+2026-11-05 10:05:17 [ERROR] Deadlock detectado na tabela pedidos
+2026-11-05 10:05:18 [WARN] Transação 88231 revertida
+2026-11-05 11:00:00 [INFO] Checkpoint concluído
+2026-11-05 11:40:30 [ERROR] Limite de conexões excedido
+2026-13-05 12:00:00 [INFO] Checkpoint concluído
+2026-11-05 12:30:00 [WARN] Consulta lenta: 4.2s em SELECT * FROM vendas
+2026-11-05 13:00:00 [INFO] Checkpoint concluído
+2026-11-05 14:22:09 [ERROR] Deadlock detectado na tabela pedidos
+2026-11-05 15:00:00 [INFO] Checkpoint concluído
+   
+2026-11-05 16:10:41 [WARN] Consulta lenta: 6.8s em SELECT * FROM vendas
+2026-11-05 16:48:00 [ERROR] Limite de conexões excedido
+2026-11-05 17:00:00 [INFO] Checkpoint concluído
+2026-11-05 18:00:00 [INFO] Backup completo agendado para 02:00

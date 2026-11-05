@@ -1,0 +1,36 @@
+2026-11-05 08:00:01 [INFO] Aplicação iniciada na porta 8080
+2026-11-05 08:00:05 [INFO] Conexão com o banco estabelecida
+2026-11-05 08:02:10 [INFO] Requisição GET /clientes concluída
+2026-11-05 08:03:44 [WARN] Tempo de resposta acima de 2s em /pedidos
+2026-11-05 08:15:32 [ERROR] Falha ao conectar no banco de dados
+2026-11-05 08:15:40 [INFO] Nova tentativa de conexão com o banco
+2026-11-05 08:15:41 [ERROR] Falha ao conectar no banco de dados
+2026-11-05 08:16:00 [INFO] Conexão com o banco restabelecida
+
+2026-11-05 09:01:12 [INFO] Requisição POST /pedidos concluída
+2026-11-05 09:05:30 [INFO] Requisição GET /produtos concluída
+2026-11-05 09:10:00 [WARN] Uso de memória em 82%
+2026-11-05 09:22:18 [ERROR] Timeout na API de pagamentos
+2026-11-05 09:22:20 [INFO] Pedido 4512 aguardando confirmação de pagamento
+Exception in thread "main" java.lang.NullPointerException
+    at br.com.loja.PedidoService.salvar(PedidoService.java:42)
+2026-11-05 10:00:00 [INFO] Rotina de limpeza de cache executada
+2026-11-05 10:30:15 [ERROR] NullPointerException em PedidoService
+2026-11-05 10:45:00 [INFO] Requisição GET /clientes concluída
+2026-11-05 11:12:09 [WARN] Tempo de resposta acima de 2s em /relatorios
+2026-11-05 11:40:33 [ERROR] Falha ao conectar no banco de dados
+2026-11-05 11:40:50 [INFO] Conexão com o banco restabelecida
+2026-11-05 12:00:00 [DEBUG] Payload recebido: {id: 4513}
+2026-11-05 12:05:00 [INFO] Requisição POST /pedidos concluída
+2026-11-05 13:15:47 [ERROR] Timeout na API de pagamentos
+2026-11-05 13:16:02 [WARN] Fila de pagamentos com 35 itens pendentes
+2026-11-05 14:00:00 [INFO] Requisição GET /produtos concluída
+2026-11-05 14:20:00 ERROR Falha ao gerar relatório
+2026-11-05 15:05:00 [ERROR] Timeout na API de pagamentos
+2026-11-05 15:30:10 [INFO] Requisição GET /clientes concluída
+2026-11-05 15:45:22 [ERROR] NullPointerException em PedidoService
+2026-11-05 16:48:02 [ERROR] Falha ao conectar no banco de dados
+2026-11-05 16:48:30 [INFO] Conexão com o banco restabelecida
+2026-11-05 17:42:10 [ERROR] Arquivo de configuração não encontrado
+2026-11-05 17:50:00 [WARN] Certificado SSL expira em 15 dias
+2026-11-05 18:00:00 [INFO] Aplicação encerrada
