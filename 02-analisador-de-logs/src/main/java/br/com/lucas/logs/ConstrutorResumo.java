@@ -1,8 +1,8 @@
 package br.com.lucas.logs;
 
-import br.com.lucas.logs.logs.Log;
-
 import java.util.List;
+
+import br.com.lucas.logs.model.Log;
 
 public class ConstrutorResumo {
 

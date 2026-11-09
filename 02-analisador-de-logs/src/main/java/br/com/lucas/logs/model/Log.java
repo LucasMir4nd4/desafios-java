@@ -1,4 +1,4 @@
-package br.com.lucas.logs.logs;
+package br.com.lucas.logs.model;
 
 import br.com.lucas.logs.Nivel;
 
