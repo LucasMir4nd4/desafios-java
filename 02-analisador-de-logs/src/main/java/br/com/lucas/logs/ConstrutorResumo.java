@@ -35,6 +35,18 @@ public class ConstrutorResumo {
         System.out.println("QUANTIDADE DE LINHAS INVÁLIDAS: " + linhasInvalidas.size());
         System.out.println("NUMERO DAS LINHAS INVÁLIDAS: " + linhasInvalidas.stream().map(Log::getNumeroLinha).toList());
 
+
+        System.out.println("Erros mais frequentes: ");
+
+        List<Log> logsErro = logs.stream().filter(l -> l.getNivel().toString().equals("ERROR")).toList();
+
+        logsErro.stream().map(Log::getConteudo).distinct().forEach(erro -> {
+            long count = logsErro.stream().filter(l -> l.getConteudo().equals(erro)).count();
+            System.out.println(" " + count + "x " + erro);
+        });
+
+
+
         System.out.println("leitura do arquivo finalizada com sucesso!");
         System.out.println(LINHA_SIMPLES.repeat(2));
 
