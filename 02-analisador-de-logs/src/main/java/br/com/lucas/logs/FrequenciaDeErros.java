@@ -14,8 +14,7 @@ public class FrequenciaDeErros {
     public FrequenciaDeErros() {
     }
 
-    public void adicionaErro(String mensagem) {
-        this.descricaoErro = mensagem;
+    public void adicionaErro() {
         this.quantidadeErro++;
     }
 

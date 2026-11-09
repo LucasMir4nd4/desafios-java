@@ -18,8 +18,8 @@ public class Main {
         LeitorDeLog leitor = new LeitorDeLog();
 
         for (String arquivo : arquivos) {
-            System.out.println("============================================");
-            System.out.println("Arquivo: " + arquivo);
+//            System.out.println("============================================");
+//            System.out.println("Arquivo: " + arquivo);
             try {
                 resultadoLeituras.add(leitor.lerLogs(pasta.resolve(arquivo).toString()));
             } catch (FileNotFoundException e) {
@@ -40,6 +40,12 @@ public class Main {
             System.out.println("Linhas fora do padrão: "+resultado.logResumo.getLinhaComErro().size());
             System.out.println("Primeiro erro: "+resultado.logResumo.getTimePrimeiroErro()+
                                " | Último erro: "+resultado.logResumo.getTimeFimErro());
+            System.out.println();
+            System.out.println("Erros mais frequentes:");
+
+            for (String erro : resultado.logResumo.getErroFrequente()) {
+                System.out.println("  "+erro);
+            }
             System.out.println();
         }
 

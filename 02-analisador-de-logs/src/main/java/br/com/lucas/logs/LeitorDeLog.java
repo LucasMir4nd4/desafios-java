@@ -25,7 +25,6 @@ public class LeitorDeLog {
         List<FrequenciaDeErros> frequenciaDeErros = new ArrayList<>();
         Integer numeroDaLinha = 0;
 
-
         logResumo.setArquivo(arquivo);
 
         try(BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
@@ -50,7 +49,7 @@ public class LeitorDeLog {
                             Boolean encontrou = false;
                             for (FrequenciaDeErros frequencia : frequenciaDeErros){
                                 if (frequencia.getDescricaoErro().equals(logs.getLast().getMensagem())) {
-                                    frequenciaDeErros.getLast().adicionaErro(frequencia.getDescricaoErro());
+                                    frequencia.adicionaErro();
                                     encontrou = true;
                                 }
                             }
@@ -68,9 +67,8 @@ public class LeitorDeLog {
                             break;
                     }
 
-                    System.out.println(linha);
+//                    System.out.println(linha);
                 } else {
-//                    logResumo.somaForaDoPadrao();
                     logResumo.adicionarLinhaComErro(numeroDaLinha);
                     linhas.add(linha);
                 }
@@ -80,13 +78,14 @@ public class LeitorDeLog {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
         frequenciaDeErros.sort(Comparator.comparingInt(FrequenciaDeErros::getQuantidadeErro).reversed());
 
-        for (FrequenciaDeErros frequencia : frequenciaDeErros) {
-            logResumo.setErroFrequente(toString().concat(String.valueOf(frequencia.getQuantidadeErro()));
-        }
+        List<String> errosMaisFrequentes = frequenciaDeErros.stream()
+                .limit(3)
+                .map(f -> f.getQuantidadeErro() + "x " + f.getDescricaoErro())
+                .toList();
+
+        logResumo.setErroFrequente(errosMaisFrequentes);
 
         return new ResultadoLeitura(logs, linhas, logResumo);
     }

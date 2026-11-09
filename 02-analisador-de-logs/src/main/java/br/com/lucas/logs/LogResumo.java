@@ -99,7 +99,13 @@ public class LogResumo {
         this.quantidadeInfo++;
     }
 
+    public List<String> getErroFrequente() {
+        return erroFrequente;
+    }
+
     public void setErroFrequente(List<String> erroFrequente) {
         this.erroFrequente = erroFrequente;
+
+
     }
 }
