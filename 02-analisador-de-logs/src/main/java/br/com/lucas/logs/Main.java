@@ -1,6 +1,5 @@
 package br.com.lucas.logs;
 
-import java.util.List;
 
 public class Main {
 
@@ -12,9 +11,9 @@ public class Main {
         ConstrutorResumo construtorResumo = new ConstrutorResumo();
 
         String[] arquivos = {
-                "C:\\Users\\LUMI\\IdeaProjects\\desafios-java\\desafios-java\\02-analisador-de-logs\\src\\main\\resources\\arquivos\\servidor-app.log",
-                "C:\\Users\\LUMI\\IdeaProjects\\desafios-java\\desafios-java\\02-analisador-de-logs\\src\\main\\resources\\arquivos\\servidor-banco.log",
-                "C:\\Users\\LUMI\\IdeaProjects\\desafios-java\\desafios-java\\02-analisador-de-logs\\src\\main\\resources\\arquivos\\servidor-email.log"
+                "/arquivos/servidor-app.log",
+                "/arquivos/servidor-banco.log",
+                "/arquivos/servidor-email.log"
         };
 
         ResultadoLeitura resultado = null;

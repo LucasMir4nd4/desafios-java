@@ -1,30 +1,36 @@
 package br.com.lucas.logs;
 
-import br.com.lucas.logs.logs.Log;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.lucas.logs.model.Log;
+
 public class LeitorLog {
 
 
     public ResultadoLeitura lerLogs(String caminhoArquivo) {
 
-        String nomeArquivo = caminhoArquivo.substring(caminhoArquivo.lastIndexOf("\\") + 1);
+        String nomeArquivo = caminhoArquivo.substring(caminhoArquivo.lastIndexOf("/") + 1);
 
         List<Log> logs = new ArrayList<>();
         List<Log> linhasInvalidas = new ArrayList<>();
         Integer contador;
 
 
-        try (BufferedReader br = new BufferedReader(new FileReader(caminhoArquivo))) {
+        InputStream is = getClass().getResourceAsStream(caminhoArquivo);
+        if (is == null) {
+            System.out.println("Arquivo não encontrado: " + caminhoArquivo);
+            throw new RuntimeException(new FileNotFoundException(caminhoArquivo));
+        }
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
             String linha = br.readLine();
             contador = 0;
 
@@ -49,9 +55,6 @@ public class LeitorLog {
                 linha = br.readLine();
             }
 
-        } catch (FileNotFoundException e) {
-            System.out.println("Arquivo não encontrado: " + caminhoArquivo);
-            throw new RuntimeException(e);
         } catch (IOException e) {
             System.out.println("Erro ao ler o arquivo: " + caminhoArquivo);
             throw new RuntimeException(e);
