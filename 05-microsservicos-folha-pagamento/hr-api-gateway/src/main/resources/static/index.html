@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HR · Painel de testes</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #171a21; --line: #262b36; --text: #e6e8ee; --muted: #8a93a6;
+    --accent: #4f8cff; --ok: #2fbf71; --warn: #e0a526; --err: #ef5350;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+  header { display: flex; align-items: center; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }
+  header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  header .sub { color: var(--muted); font-size: 12px; }
+  header nav { margin-left: auto; display: flex; gap: 8px; }
+  a.btn, button { background: #222735; color: var(--text); border: 1px solid var(--line); padding: 7px 12px; border-radius: 6px; font: inherit; cursor: pointer; text-decoration: none; }
+  a.btn:hover, button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  main { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 16px; padding: 16px 24px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+  section h2 { font-size: 14px; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+  section .hint { color: var(--muted); font-size: 12px; margin: 0 0 12px; }
+  .tag { font: 11px var(--mono); color: var(--muted); border: 1px solid var(--line); padding: 1px 6px; border-radius: 4px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; margin-bottom: 10px; }
+  label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+  input { background: #0f1115; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; font: inherit; width: 140px; }
+  input.wide { width: 200px; }
+  input:focus { outline: none; border-color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 500; }
+  td.num { font-family: var(--mono); text-align: right; }
+  .out { margin-top: 8px; }
+  .empty { color: var(--muted); font-style: italic; }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+  .card .k { color: var(--muted); font-size: 12px; }
+  .card .v { font-family: var(--mono); }
+  .card .total { grid-column: 1 / -1; font-size: 20px; color: var(--ok); }
+  .err { color: var(--err); font-family: var(--mono); font-size: 12px; white-space: pre-wrap; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: var(--muted); }
+  .dot.up { background: var(--ok); } .dot.down { background: var(--err); }
+  .svc { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .svc:last-child { border-bottom: 0; }
+  .inst { font: 12px var(--mono); color: var(--muted); }
+  .bars { display: flex; flex-direction: column; gap: 6px; }
+  .bar { display: grid; grid-template-columns: 70px 1fr 40px; gap: 8px; align-items: center; font: 12px var(--mono); }
+  .bar .fill { height: 10px; background: var(--accent); border-radius: 3px; }
+  #log { grid-column: 1 / -1; }
+  #logList { font: 12px var(--mono); max-height: 340px; overflow: auto; }
+  details { border-bottom: 1px solid var(--line); padding: 4px 0; }
+  summary { cursor: pointer; display: flex; gap: 10px; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  .st { min-width: 36px; font-weight: 600; }
+  .s2 { color: var(--ok); } .s4 { color: var(--warn); } .s5, .s0 { color: var(--err); }
+  pre { margin: 6px 0 4px; padding: 8px; background: #0f1115; border-radius: 6px; overflow: auto; max-height: 220px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>HR · Painel de testes</h1>
+    <div class="sub">Todas as chamadas passam pelo API Gateway (porta 8765)</div>
+  </div>
+  <nav>
+    <a class="btn" href="/swagger-ui.html" target="_blank">Swagger</a>
+    <a class="btn" id="eurekaLink" href="#" target="_blank">Eureka</a>
+  </nav>
+</header>
+
+<main>
+  <section>
+    <h2>Serviços registrados <span class="tag">GET /registry/apps</span></h2>
+    <p class="hint">Lido do Eureka a cada 5s. Se um serviço não aparece aqui, o gateway não consegue rotear pra ele.</p>
+    <div id="services" class="empty">Carregando…</div>
+  </section>
+
+  <section>
+    <h2>Funcionários <span class="tag">hr-worker</span></h2>
+    <p class="hint">TASK-01, 02 e 03.</p>
+    <div class="row">
+      <button class="primary" id="btnList">Listar todos</button>
+      <label>id <input id="findId" type="number" value="1"></label>
+      <button id="btnFind">Buscar</button>
+    </div>
+    <div class="row">
+      <label>nome <input id="newName" class="wide" placeholder="Isabela Freitas"></label>
+      <label>diária <input id="newIncome" type="number" step="0.01" placeholder="310.40"></label>
+      <button id="btnCreate">Cadastrar</button>
+    </div>
+    <div id="workersOut" class="out"></div>
+  </section>
+
+  <section>
+    <h2>Folha de pagamento <span class="tag">hr-payroll</span></h2>
+    <p class="hint">TASK-04. O hr-payroll chama o hr-worker por baixo (Feign).</p>
+    <div class="row">
+      <label>workerId <input id="payId" type="number" value="1"></label>
+      <label>dias <input id="payDays" type="number" value="22"></label>
+      <button class="primary" id="btnPay">Calcular</button>
+    </div>
+    <div id="payOut" class="out"></div>
+  </section>
+
+  <section>
+    <h2>Balanceamento de carga <span class="tag">X-Instance</span></h2>
+    <p class="hint">TASK-05. Dispara N chamadas a <code>GET /hr-worker/workers/1</code> e conta qual instância respondeu (header <code>X-Instance</code>).</p>
+    <div class="row">
+      <label>chamadas <input id="lbCount" type="number" value="20"></label>
+      <button class="primary" id="btnLb">Disparar</button>
+    </div>
+    <div id="lbOut" class="out"></div>
+  </section>
+
+  <section id="log">
+    <h2>Log de requisições <button id="btnClear" style="margin-left:auto;padding:3px 8px">limpar</button></h2>
+    <p class="hint">Clique numa linha para ver headers e corpo da resposta.</p>
+    <div id="logList"><div class="empty">Nenhuma requisição ainda.</div></div>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const brl = (n) => Number(n).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// Link do dashboard do Eureka: funciona em localhost e no Codespaces (porta no subdomínio)
+(() => {
+  const { protocol, hostname, port } = location;
+  $('eurekaLink').href = hostname.includes('-8765.')
+    ? `${protocol}//${hostname.replace('-8765.', '-8761.')}/`
+    : `${protocol}//${hostname}:8761/`;
+})();
+
+async function call(method, url, body, { log = true } = {}) {
+  const start = performance.now();
+  let res, data, text = '', status = 0, headers = {};
+  try {
+    res = await fetch(url, {
+      method,
+      headers: { 'Accept': 'application/json', ...(body ? { 'Content-Type': 'application/json' } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    status = res.status;
+    res.headers.forEach((v, k) => headers[k] = v);
+    text = await res.text();
+    try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  } catch (e) {
+    data = { erro: 'Falha de rede: ' + e.message };
+  }
+  const ms = Math.round(performance.now() - start);
+  if (log) addLog({ method, url, status, ms, headers, data, body });
+  return { ok: status >= 200 && status < 300, status, data, headers };
+}
+
+function addLog({ method, url, status, ms, headers, data, body }) {
+  const list = $('logList');
+  if (list.querySelector('.empty')) list.innerHTML = '';
+  const d = document.createElement('details');
+  const cls = 's' + String(status)[0];
+  const h = Object.entries(headers).map(([k, v]) => `${k}: ${v}`).join('\n');
+  d.innerHTML = `<summary><span class="st ${cls}">${status || 'ERR'}</span><span>${method}</span><span>${esc(url)}</span><span style="margin-left:auto;color:var(--muted)">${ms} ms${headers['x-instance'] ? ' · inst ' + esc(headers['x-instance']) : ''}</span></summary>
+    ${body ? `<pre>// request body\n${esc(JSON.stringify(body, null, 2))}</pre>` : ''}
+    <pre>${esc(h)}</pre><pre>${esc(typeof data === 'string' ? data : JSON.stringify(data, null, 2))}</pre>`;
+  list.prepend(d);
+}
+
+function errorBox(r) {
+  const msg = r.data && typeof r.data === 'object'
+    ? (r.data.message || r.data.error || r.data.erro || JSON.stringify(r.data))
+    : (r.data || 'sem corpo');
+  let extra = '';
+  if (r.data && Array.isArray(r.data.errors)) extra = '\n' + r.data.errors.map(e => `• ${e.field}: ${e.message}`).join('\n');
+  let tip = '';
+  if (r.status === 404 && !r.data?.message) tip = '\n(dica: endpoint ainda não implementado?)';
+  if (r.status === 503) tip = '\n(dica: o serviço está registrado no Eureka?)';
+  return `<div class="err">HTTP ${r.status || 'ERR'} — ${esc(msg)}${esc(extra)}${tip}</div>`;
+}
+
+function workersTable(list) {
+  if (!Array.isArray(list) || list.length === 0) return '<div class="empty">Lista vazia.</div>';
+  return `<table><thead><tr><th>id</th><th>nome</th><th style="text-align:right">diária</th></tr></thead><tbody>
+    ${list.map(w => `<tr><td>${esc(w.id)}</td><td>${esc(w.name)}</td><td class="num">${brl(w.dailyIncome)}</td></tr>`).join('')}
+  </tbody></table>`;
+}
+
+$('btnList').onclick = async () => {
+  const r = await call('GET', '/hr-worker/workers');
+  $('workersOut').innerHTML = r.ok ? workersTable(r.data) : errorBox(r);
+};
+$('btnFind').onclick = async () => {
+  const r = await call('GET', `/hr-worker/workers/${encodeURIComponent($('findId').value)}`);
+  $('workersOut').innerHTML = r.ok ? workersTable([r.data]) : errorBox(r);
+};
+$('btnCreate').onclick = async () => {
+  const income = $('newIncome').value;
+  const body = { name: $('newName').value, dailyIncome: income === '' ? null : Number(income) };
+  const r = await call('POST', '/hr-worker/workers', body);
+  $('workersOut').innerHTML = r.ok
+    ? `<div style="color:var(--ok);margin-bottom:6px">Criado (${r.status})${r.headers.location ? ' · Location: ' + esc(r.headers.location) : ''}</div>` + workersTable([r.data])
+    : errorBox(r);
+};
+
+$('btnPay').onclick = async () => {
+  const r = await call('GET', `/hr-payroll/payments/${encodeURIComponent($('payId').value)}/days/${encodeURIComponent($('payDays').value)}`);
+  if (!r.ok) { $('payOut').innerHTML = errorBox(r); return; }
+  const p = r.data;
+  $('payOut').innerHTML = `<div class="card">
+    <div><div class="k">funcionário</div><div class="v">${esc(p.name)}</div></div>
+    <div><div class="k">diária × dias</div><div class="v">${brl(p.dailyIncome)} × ${esc(p.days)}</div></div>
+    <div class="total">${brl(p.total)}</div></div>`;
+};
+
+$('btnLb').onclick = async () => {
+  const n = Math.min(Math.max(parseInt($('lbCount').value) || 1, 1), 200);
+  $('lbOut').innerHTML = '<div class="empty">Disparando…</div>';
+  const counts = {}; let fails = 0;
+  for (let i = 0; i < n; i++) {
+    const r = await call('GET', '/hr-worker/workers/1', null, { log: false });
+    if (!r.ok) { fails++; continue; }
+    const k = r.headers['x-instance'] || '(sem header)';
+    counts[k] = (counts[k] || 0) + 1;
+  }
+  const max = Math.max(1, ...Object.values(counts));
+  $('lbOut').innerHTML = `<div class="bars">${Object.entries(counts).map(([k, v]) =>
+    `<div class="bar"><span>${esc(k)}</span><div class="fill" style="width:${v / max * 100}%"></div><span>${v}</span></div>`).join('')}</div>
+    ${fails ? `<div class="err" style="margin-top:6px">${fails} falha(s)</div>` : ''}
+    ${Object.keys(counts).length === 1 && !fails ? '<p class="hint" style="margin-top:8px">Só uma instância respondeu. Suba outra com <code>WORKERS=2 ./run.sh</code>.</p>' : ''}`;
+};
+
+$('btnClear').onclick = () => $('logList').innerHTML = '<div class="empty">Nenhuma requisição ainda.</div>';
+
+async function refreshServices() {
+  const r = await call('GET', '/registry/apps', null, { log: false });
+  const el = $('services');
+  if (!r.ok) { el.innerHTML = `<div class="err">Eureka inacessível (HTTP ${r.status || 'ERR'}). O hr-eureka-server está rodando?</div>`; return; }
+  let apps = r.data?.applications?.application || [];
+  if (!Array.isArray(apps)) apps = [apps];
+  const expected = ['HR-API-GATEWAY', 'HR-WORKER', 'HR-PAYROLL'];
+  el.classList.remove('empty');
+  el.innerHTML = expected.map(name => {
+    const app = apps.find(a => a.name === name);
+    let inst = app ? app.instance : [];
+    if (!Array.isArray(inst)) inst = [inst];
+    const up = inst.filter(i => i.status === 'UP');
+    return `<div class="svc"><span><span class="dot ${up.length ? 'up' : 'down'}"></span> ${name.toLowerCase()}</span>
+      <span class="inst">${inst.length ? inst.map(i => esc(i.instanceId) + ' ' + esc(i.status)).join(' · ') : 'não registrado'}</span></div>`;
+  }).join('');
+}
+refreshServices();
+setInterval(refreshServices, 5000);
+</script>
+</body>
+</html>

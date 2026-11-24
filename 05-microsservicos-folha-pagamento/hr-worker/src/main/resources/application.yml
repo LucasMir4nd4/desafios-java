@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: hr-worker
+
+  datasource:
+    url: jdbc:h2:mem:hrworker
+    username: sa
+    password:
+
+  jpa:
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    # Roda o data.sql DEPOIS do Hibernate criar as tabelas a partir da sua entidade
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+      # Enquanto a entidade (tabela tb_worker) não existir, o data.sql falha.
+      # Isso evita que a aplicação caia antes de você implementar a TASK-01.
+      continue-on-error: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  # Porta padrão 8001. Para subir outra instância: PORT=8002 (TASK-05)
+  port: ${PORT:8001}
+  # Faz o Swagger montar as URLs certas quando a chamada vem pelo gateway
+  forward-headers-strategy: framework
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+    registry-fetch-interval-seconds: 5
+  instance:
+    # Cada instância aparece com a própria porta no Eureka (ex.: hr-worker:8001)
+    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

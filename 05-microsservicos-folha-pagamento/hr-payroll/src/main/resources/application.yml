@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: hr-payroll
+
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 2000
+            read-timeout: 5000
+      circuitbreaker:
+        # TASK-06 (bônus): mude para true quando for implementar o fallback
+        enabled: false
+
+server:
+  port: ${PORT:8101}
+  forward-headers-strategy: framework
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+    registry-fetch-interval-seconds: 5
+  instance:
+    # Cada instância aparece com a própria porta no Eureka (ex.: hr-worker:8001)
+    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

@@ -1,0 +1,86 @@
+openapi: 3.0.3
+info:
+  title: hr-payroll — CONTRATO DA TAREFA
+  version: 1.0.0
+  description: |
+    Contrato que o **hr-payroll** precisa cumprir. Ele NÃO tem banco: busca o funcionário
+    no **hr-worker** (via OpenFeign + Eureka) e calcula o pagamento.
+
+    Regra: `total = dailyIncome × days`, com 2 casas decimais (arredondamento HALF_EVEN).
+servers:
+  - url: /hr-payroll
+    description: Via API Gateway
+tags:
+  - name: Payments
+paths:
+  /payments/{workerId}/days/{days}:
+    get:
+      tags: [Payments]
+      summary: "TASK-04 — Calcula o pagamento de um funcionário por N dias"
+      operationId: getPayment
+      parameters:
+        - name: workerId
+          in: path
+          required: true
+          schema: { type: integer, format: int64, example: 1 }
+        - name: days
+          in: path
+          required: true
+          description: Quantidade de dias trabalhados (1 a 31)
+          schema: { type: integer, minimum: 1, maximum: 31, example: 22 }
+      responses:
+        "200":
+          description: Pagamento calculado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Payment" }
+              example:
+                name: "Ana Souza"
+                dailyIncome: 200.00
+                days: 22
+                total: 4400.00
+        "400":
+          description: days fora do intervalo 1..31
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StandardError" }
+        "404":
+          description: O hr-worker respondeu 404 (funcionário não existe)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StandardError" }
+              example:
+                timestamp: "2026-11-23T21:30:00Z"
+                status: 404
+                error: "Not Found"
+                message: "Funcionário 999 não encontrado"
+                path: "/payments/999/days/10"
+        "503":
+          description: "TASK-06 (bônus) — hr-worker fora do ar ou sem resposta"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StandardError" }
+              example:
+                timestamp: "2026-11-23T21:30:00Z"
+                status: 503
+                error: "Service Unavailable"
+                message: "Serviço de funcionários indisponível, tente novamente em instantes"
+                path: "/payments/1/days/10"
+components:
+  schemas:
+    Payment:
+      type: object
+      required: [name, dailyIncome, days, total]
+      properties:
+        name: { type: string, example: "Ana Souza" }
+        dailyIncome: { type: number, example: 200.00 }
+        days: { type: integer, example: 22 }
+        total: { type: number, example: 4400.00 }
+    StandardError:
+      type: object
+      properties:
+        timestamp: { type: string, format: date-time }
+        status: { type: integer }
+        error: { type: string }
+        message: { type: string }
+        path: { type: string }
