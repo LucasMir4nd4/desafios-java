@@ -46,4 +46,15 @@ public class Venda {
         return valor;
     }
 
+
+    @Override
+    public String toString() {
+        return "Venda{" +
+                "data=" + data +
+                ", nome='" + nome + '\'' +
+                ", quantidade=" + quantidade +
+                ", valor=" + valor +
+                ", valida=" + valida +
+                '}';
+    }
 }

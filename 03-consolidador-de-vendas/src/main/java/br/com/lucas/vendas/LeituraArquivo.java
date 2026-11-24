@@ -15,34 +15,29 @@ public class LeituraArquivo {
 
         List<Venda> vendas = new ArrayList<>();
 
-        LocalDateTime data;
-        String nome;
-        int quantidade;
-        double valor;
+        LocalDateTime data = null;
+        String nome = null;
+        int quantidade = 0;
+        double valor = 0.0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(caminhoArquivo))) {
             
             String linha = br.readLine();
             String[]vetorLinha = linha.split(";");
 
-
             
             while (linha != null) {
                 for (int i = 0; i < vetorLinha.length; i++) {
                     data = LocalDateTime.parse(vetorLinha[0]);
                     nome = vetorLinha[1];
-                    quantidade = Integer.valueOf(vetorLinha[2]);
-                    valor = Integer.valueOf(vetorLinha[3]);
+                    quantidade = Integer.parseInt(vetorLinha[2]);
+                    valor = Double.parseDouble(vetorLinha[3]);
                 }
-
-                
-
-                // vendas.add(new Venda(data,nome,quantidade,valor));
+                linha = br.readLine();
+                vendas.add(new Venda(data,nome,quantidade,valor));
             }
-
-
         } catch (IOException e) {
-            //TODO tratar
+            vendas.add(new Venda(nome));
             return null;
         }
 
